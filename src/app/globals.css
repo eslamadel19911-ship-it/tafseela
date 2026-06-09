@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap');
+
+:root {
+  --gold: #C9A96E;
+  --dark: #1A1A1A;
+  --light: #FAF8F5;
+  --gray: #6B6B6B;
+  --border: #E8E0D5;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { direction: rtl; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--light);
+  color: var(--dark);
+}
+
+.btn-primary {
+  background: var(--dark);
+  color: white;
+  padding: 12px 32px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  letter-spacing: 1px;
+  transition: background 0.3s;
+}
+.btn-primary:hover { background: var(--gold); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--dark);
+  padding: 10px 28px;
+  border: 1px solid var(--dark);
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: all 0.3s;
+}
+.btn-outline:hover { background: var(--dark); color: white; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+.gold { color: var(--gold); }
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.section-subtitle {
+  color: var(--gray);
+  font-size: 0.95rem;
+  margin-bottom: 40px;
+}
