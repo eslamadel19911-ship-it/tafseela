@@ -9,6 +9,7 @@ export default function Navbar() {
   const { count } = useCart();
   const { user, logout } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
@@ -24,46 +25,39 @@ export default function Navbar() {
 
           {/* اللوجو */}
           <Link href="/" style={{ textDecoration: 'none' }}>
-  <img
-    src="/logo.png"
-    alt="تفصيلة"
-    style={{
-      height: 150,
-      width: 'auto',
-      objectFit: 'contain',
-      /* يحول الأسود لأبيض على الخلفية الداكنة */
-    }}
-  />
-</Link>
+            <img src="/logo.png" alt="تفصيلة"
+              style={{ height: 50, width: 'auto', objectFit: 'contain' }}
+            />
+          </Link>
 
-          {/* الروابط */}
-          <div style={{ display: 'flex', gap: 32 }}>
+          {/* الروابط - Desktop */}
+          <div className="nav-links-desktop" style={{ display: 'flex', gap: 32 }}>
             {[['/', 'الرئيسية'], ['/products', 'المنتجات'], ['/about', 'من نحن']].map(([href, label]) => (
               <Link key={href} href={href} style={{
                 textDecoration: 'none', color: 'white',
-                fontSize: '0.9rem', fontWeight: 500
+                fontSize: '0.9rem', fontWeight: 500, whiteSpace: 'nowrap'
               }}>{label}</Link>
             ))}
           </div>
 
-          {/* دخول + سلة */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            {user ? (
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <Link href="/account" style={{ color: '#aaa', fontSize: '0.85rem', textDecoration: 'none' }}>
-                  حسابي
-                </Link>
+          {/* أيقونات اليمين */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+
+            {/* دخول - Desktop فقط */}
+            <div className="nav-login-desktop">
+              {user ? (
                 <button onClick={logout} style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   color: '#aaa', fontSize: '0.85rem', fontFamily: 'Cairo, sans-serif'
                 }}>خروج</button>
-              </div>
-            ) : (
-              <Link href="/login" style={{ color: '#aaa', fontSize: '0.85rem', textDecoration: 'none' }}>
-                دخول
-              </Link>
-            )}
+              ) : (
+                <Link href="/login" style={{ color: '#aaa', fontSize: '0.85rem', textDecoration: 'none' }}>
+                  دخول
+                </Link>
+              )}
+            </div>
 
+            {/* سلة التسوق */}
             <button onClick={() => setDrawerOpen(true)} style={{
               position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 4
             }}>
@@ -81,10 +75,55 @@ export default function Navbar() {
                 }}>{count}</span>
               )}
             </button>
-          </div>
 
+            {/* زر الهامبرجر - Mobile فقط */}
+            <button className="nav-hamburger" onClick={() => setMenuOpen(!menuOpen)} style={{
+              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+              display: 'none', flexDirection: 'column', gap: 5
+            }}>
+              <span style={{ display: 'block', width: 22, height: 2, background: 'white', transition: '0.3s',
+                transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }}/>
+              <span style={{ display: 'block', width: 22, height: 2, background: 'white', transition: '0.3s',
+                opacity: menuOpen ? 0 : 1 }}/>
+              <span style={{ display: 'block', width: 22, height: 2, background: 'white', transition: '0.3s',
+                transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }}/>
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="nav-mobile-menu" style={{
+            background: '#111', borderTop: '1px solid #333',
+            padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 16
+          }}>
+            {[['/', 'الرئيسية'], ['/products', 'المنتجات'], ['/about', 'من نحن']].map(([href, label]) => (
+              <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{
+                textDecoration: 'none', color: 'white', fontSize: '1rem', fontWeight: 500
+              }}>{label}</Link>
+            ))}
+            {user ? (
+              <button onClick={() => { logout(); setMenuOpen(false); }} style={{
+                background: 'none', border: 'none', cursor: 'pointer', color: '#aaa',
+                fontSize: '0.9rem', fontFamily: 'Cairo, sans-serif', textAlign: 'right', padding: 0
+              }}>خروج</button>
+            ) : (
+              <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+                color: '#aaa', fontSize: '0.9rem', textDecoration: 'none'
+              }}>دخول</Link>
+            )}
+          </div>
+        )}
       </nav>
+
+      {/* CSS للموبايل */}
+      <style>{`
+        @media (max-width: 768px) {
+          .nav-links-desktop { display: none !important; }
+          .nav-login-desktop { display: none !important; }
+          .nav-hamburger { display: flex !important; }
+        }
+      `}</style>
 
       <CartDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </>

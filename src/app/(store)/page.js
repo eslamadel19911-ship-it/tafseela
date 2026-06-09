@@ -5,11 +5,9 @@ import ProductCard from '@/components/ProductCard';
 import { useEffect, useState } from 'react';
 import { collection, query, limit, getDocs, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { CartProvider } from '@/context/CartContext';
-import { AuthProvider } from '@/context/AuthContext';
 import Link from 'next/link';
 
-function HomeContent() {
+export default function HomePage() {
   const [featured, setFeatured] = useState([]);
 
   useEffect(() => {
@@ -27,67 +25,73 @@ function HomeContent() {
 
       {/* Hero */}
       <section style={{
-        height: '90vh',
+        minHeight: '90vh',
         background: 'var(--dark)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <div style={{ textAlign: 'center', color: 'white', padding: '0 20px' }}>
+        <div style={{ textAlign: 'center', color: 'white', padding: '40px 20px' }}>
           <img
             src="/logo.png"
             alt="tafseela"
-            style={{ height: 750, width: 'auto', objectFit: 'contain', marginBottom: -250 }}
+            style={{
+              width: '100%',
+              maxWidth: 500,
+              height: 'auto',
+              objectFit: 'contain',
+              marginBottom: 24
+            }}
           />
-          <p style={{ fontSize: '2.1rem', color: '#aaa', marginBottom: 40, letterSpacing: 1 }}>
-            {'بتحكي عنك'}
+          <p style={{ fontSize: 'clamp(1rem, 4vw, 2.1rem)', color: '#aaa', marginBottom: 40, letterSpacing: 1 }}>
+            بتحكي عنك
           </p>
           <Link href="/products">
             <button className="btn-outline" style={{ color: 'white', borderColor: 'white', padding: '12px 40px' }}>
-              {'تسوق الآن'}
+              تسوق الآن
             </button>
           </Link>
         </div>
       </section>
 
       {/* Featured Products */}
-      <section style={{ padding: '80px 20px' }}>
+      <section style={{ padding: 'clamp(40px, 8vw, 80px) 20px' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <h2 className="section-title">{'المنتجات المميزة'}</h2>
-            <p className="section-subtitle">{'اكتشف أحدث تشكيلات تفصيلة'}</p>
+            <h2 className="section-title">المنتجات المميزة</h2>
+            <p className="section-subtitle">اكتشف أحدث تشكيلات تفصيلة</p>
           </div>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(260px, 100%), 1fr))',
             gap: 24
           }}>
             {featured.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
           <div style={{ textAlign: 'center', marginTop: 48 }}>
             <Link href="/products">
-              <button className="btn-outline">{'عرض كل المنتجات'}</button>
+              <button className="btn-outline">عرض كل المنتجات</button>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Brand Story */}
-      <section style={{ background: 'var(--dark)', color: 'white', padding: '100px 20px' }}>
+      <section style={{ background: 'var(--dark)', color: 'white', padding: 'clamp(60px, 10vw, 100px) 20px' }}>
         <div className="container" style={{ maxWidth: 700, textAlign: 'center', margin: '0 auto' }}>
           <div style={{ width: 40, height: 2, background: 'var(--gold)', margin: '0 auto 32px' }} />
-          <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: 24 }}>{'قصتنا'}</h2>
-          <p style={{ color: '#aaa', lineHeight: 2, fontSize: '1rem', marginBottom: 16 }}>
-            {'تفصيلة بدأت من فكرة بسيطة: إن كل شخص له أسلوبه، ذوقه، وتفاصيله الخاصة.'}
+          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 700, marginBottom: 24 }}>قصتنا</h2>
+          <p style={{ color: '#aaa', lineHeight: 2, fontSize: 'clamp(0.9rem, 2.5vw, 1rem)', marginBottom: 16 }}>
+            تفصيلة بدأت من فكرة بسيطة: إن كل شخص له أسلوبه، ذوقه، وتفاصيله الخاصة.
           </p>
-          <p style={{ color: '#aaa', lineHeight: 2, fontSize: '1rem', marginBottom: 16 }}>
-            {'نحن لا نصمم ملابس فقط، بل نصنع قطعا تعبر عنك، عن هدوئك، عن اختياراتك، وعن الطريقة التي تحب ان تظهر بها للعالم.'}
+          <p style={{ color: '#aaa', lineHeight: 2, fontSize: 'clamp(0.9rem, 2.5vw, 1rem)', marginBottom: 16 }}>
+            نحن لا نصمم ملابس فقط، بل نصنع قطعا تعبر عنك، عن هدوئك، عن اختياراتك، وعن الطريقة التي تحب ان تظهر بها للعالم.
           </p>
-          <p style={{ color: '#aaa', lineHeight: 2, fontSize: '1rem', marginBottom: 16 }}>
-            {'في تفصيلة، نهتم بكل شيء: الخامة، القصة، اللون، التيكت، والتغليف. لاننا نؤمن ان الجمال الحقيقي لا يكون في الشكل فقط، بل في كل تفصيلة صغيرة تكمل الحكاية.'}
+          <p style={{ color: '#aaa', lineHeight: 2, fontSize: 'clamp(0.9rem, 2.5vw, 1rem)', marginBottom: 16 }}>
+            في تفصيلة، نهتم بكل شيء: الخامة، القصة، اللون، التيكت، والتغليف. لاننا نؤمن ان الجمال الحقيقي لا يكون في الشكل فقط، بل في كل تفصيلة صغيرة تكمل الحكاية.
           </p>
           <p style={{ fontWeight: 700, color: 'var(--gold)', marginTop: 24, fontSize: '1.1rem' }}>
-            {'تفصيلة.. بتحكي عنك'}
+            تفصيلة.. بتحكي عنك
           </p>
         </div>
       </section>
@@ -107,15 +111,5 @@ function HomeContent() {
 
       <Footer />
     </>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <HomeContent />
-      </CartProvider>
-    </AuthProvider>
   );
 }
