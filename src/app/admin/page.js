@@ -34,7 +34,7 @@ function LoginScreen({ onLogin }) {
     e.preventDefault();
 
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      localStorage.setItem('adminLoggedIn', 'true');
+      window.localStorage.setItem('adminLoggedIn', 'true');
       onLogin();
     } else {
       setError('اسم المستخدم أو كلمة المرور غلط');
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedLogin = localStorage.getItem('adminLoggedIn');
+    const savedLogin = window.localStorage.getItem('adminLoggedIn');
 
     if (savedLogin === 'true') {
       setIsLoggedIn(true);
@@ -419,7 +419,7 @@ export default function AdminDashboard() {
   };
 
   const logout = () => {
-    localStorage.removeItem('adminLoggedIn');
+    window.localStorage.removeItem('adminLoggedIn');
     setIsLoggedIn(false);
     setTab('dashboard');
   };
