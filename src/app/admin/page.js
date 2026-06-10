@@ -4,7 +4,6 @@ import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 
-// ✅ بيانات الدخول — غيّر الـ PASSWORD لكلمة سر قوية
 const ADMIN_USERNAME = 'tafseela';
 const ADMIN_PASSWORD = 'Tafseela@2025';
 
@@ -17,7 +16,6 @@ const STATUS_LABELS = {
   shipped: 'تم الشحن', delivered: 'تم التسليم', cancelled: 'ملغي',
 };
 
-// ✅ شاشة تسجيل الدخول
 function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -40,220 +38,38 @@ function LoginScreen({ onLogin }) {
       background: '#1A1A1A', fontFamily: 'Cairo, sans-serif', direction: 'rtl'
     }}>
       <div style={{ background: 'white', padding: '48px 40px', borderRadius: 12, width: '100%', maxWidth: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
-
-        {/* اللوجو */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: 1 }}>تفصيلة</div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800 }}>تفصيلة</div>
           <div style={{ fontSize: '0.6rem', letterSpacing: 4, color: '#C9A96E', marginTop: 4 }}>ADMIN PANEL</div>
         </div>
-
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', fontWeight: 600 }}>
-              اسم المستخدم
-            </label>
-            <input
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              required
-              autoComplete="username"
-              style={{
-                width: '100%', padding: '11px 14px', border: '1px solid #ddd',
-                borderRadius: 6, fontFamily: 'Cairo, sans-serif', fontSize: '0.95rem'
-              }}
-            />
+            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', fontWeight: 600 }}>اسم المستخدم</label>
+            <input value={username} onChange={e => setUsername(e.target.value)} required autoComplete="username"
+              style={{ width: '100%', padding: '11px 14px', border: '1px solid #ddd', borderRadius: 6, fontFamily: 'Cairo, sans-serif', fontSize: '0.95rem' }} />
           </div>
-
           <div style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', fontWeight: 600 }}>
-              كلمة المرور
-            </label>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', fontWeight: 600 }}>كلمة المرور</label>
             <div style={{ position: 'relative' }}>
-              <input
-                type={showPass ? 'text' : 'password'}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                style={{
-                  width: '100%', padding: '11px 44px 11px 14px', border: '1px solid #ddd',
-                  borderRadius: 6, fontFamily: 'Cairo, sans-serif', fontSize: '0.95rem'
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                style={{
-                  position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-                  background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: '#888'
-                }}
-              >
+              <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password"
+                style={{ width: '100%', padding: '11px 44px 11px 14px', border: '1px solid #ddd', borderRadius: 6, fontFamily: 'Cairo, sans-serif', fontSize: '0.95rem' }} />
+              <button type="button" onClick={() => setShowPass(!showPass)}
+                style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: '#888' }}>
                 {showPass ? '🙈' : '👁️'}
               </button>
             </div>
           </div>
-
           {error && (
-            <div style={{
-              background: '#fee2e2', color: '#ef4444', padding: '10px 14px',
-              borderRadius: 6, fontSize: '0.85rem', marginBottom: 16, textAlign: 'center'
-            }}>
+            <div style={{ background: '#fee2e2', color: '#ef4444', padding: '10px 14px', borderRadius: 6, fontSize: '0.85rem', marginBottom: 16, textAlign: 'center' }}>
               ❌ {error}
             </div>
           )}
-
-          <button
-            type="submit"
-            style={{
-              width: '100%', padding: '13px', background: '#1A1A1A', color: 'white',
-              border: 'none', borderRadius: 6, cursor: 'pointer',
-              fontFamily: 'Cairo, sans-serif', fontSize: '1rem', fontWeight: 600
-            }}
-          >
+          <button type="submit"
+            style={{ width: '100%', padding: '13px', background: '#1A1A1A', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'Cairo, sans-serif', fontSize: '1rem', fontWeight: 600 }}>
             دخول
           </button>
         </form>
       </div>
-    </div>
-  );
-}
-
-export default function AdminDashboard() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [stats, setStats] = useState({ orders: 0, revenue: 0, products: 0, pending: 0 });
-  const [orders, setOrders] = useState([]);
-  const [tab, setTab] = useState('dashboard');
-  const [loading, setLoading] = useState(true);
-
-  // ✅ لو مش logged in، ظهّر شاشة الدخول
-  if (!isLoggedIn) {
-    return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
-  }
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const ordersSnap = await getDocs(collection(db, 'orders'));
-        const productsSnap = await getDocs(collection(db, 'products'));
-        const ordersData = ordersSnap.docs
-          .map(d => ({ id: d.id, ...d.data() }))
-          .sort((a, b) => {
-            const dateA = a.createdAt?.toDate?.() || new Date(0);
-            const dateB = b.createdAt?.toDate?.() || new Date(0);
-            return dateB - dateA;
-          });
-        setOrders(ordersData);
-        setStats({
-          orders: ordersData.length,
-          revenue: ordersData.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0),
-          products: productsSnap.size,
-          pending: ordersData.filter(o => o.status === 'pending').length,
-        });
-      } catch (err) {
-        console.error('Error loading data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
-
-  const updateStatus = async (id, status) => {
-    await updateDoc(doc(db, 'orders', id), { status });
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-    setStats(prev => ({
-      ...prev,
-      pending: orders.filter(o => (o.id === id ? status : o.status) === 'pending').length,
-    }));
-  };
-
-  const cards = [
-    { label: 'إجمالي الطلبات', value: stats.orders, icon: '📦', color: '#1A1A1A' },
-    { label: 'الإيرادات', value: `${stats.revenue.toLocaleString()} جنيه`, icon: '💰', color: '#C9A96E' },
-    { label: 'المنتجات', value: stats.products, icon: '👗', color: '#1A1A1A' },
-    { label: 'طلبات معلقة', value: stats.pending, icon: '⏳', color: '#f59e0b' },
-  ];
-
-  if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Cairo, sans-serif' }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem', marginBottom: 12 }}>⏳</div>
-        <p>جاري التحميل...</p>
-      </div>
-    </div>
-  );
-
-  return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f5f5', fontFamily: 'Cairo, sans-serif', direction: 'rtl' }}>
-      {/* Sidebar */}
-      <aside style={{ width: 240, background: '#1A1A1A', color: 'white', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh' }}>
-        <div style={{ padding: '28px 24px', borderBottom: '1px solid #333' }}>
-          <div style={{ fontSize: '1.3rem', fontWeight: 800 }}>تفصيلة</div>
-          <div style={{ fontSize: '0.55rem', letterSpacing: 4, color: '#C9A96E', marginTop: 2 }}>ADMIN PANEL</div>
-        </div>
-        <nav style={{ padding: '16px 12px', flex: 1 }}>
-          {[
-            { id: 'dashboard', label: 'لوحة التحكم', icon: '📊' },
-            { id: 'orders', label: 'الطلبات', icon: '📦' },
-            { id: 'products', label: 'المنتجات', icon: '👗' },
-          ].map(item => (
-            <button key={item.id} onClick={() => setTab(item.id)} style={{
-              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-              padding: '12px 16px', background: tab === item.id ? '#C9A96E' : 'transparent',
-              border: 'none', color: 'white', cursor: 'pointer', borderRadius: 6,
-              marginBottom: 4, fontFamily: 'Cairo, sans-serif', fontSize: '0.9rem', fontWeight: 500
-            }}>
-              <span>{item.icon}</span>{item.label}
-            </button>
-          ))}
-        </nav>
-        <div style={{ padding: '16px 24px', borderTop: '1px solid #333', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Link href="/" style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.85rem' }}>← العودة للموقع</Link>
-          {/* ✅ زر تسجيل الخروج */}
-          <button
-            onClick={() => setIsLoggedIn(false)}
-            style={{ background: 'none', border: '1px solid #444', color: '#aaa', padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontFamily: 'Cairo, sans-serif', fontSize: '0.8rem', textAlign: 'center' }}
-          >
-            🚪 تسجيل الخروج
-          </button>
-        </div>
-      </aside>
-
-      {/* Main — باقي الكود زي ما هو */}
-      <main style={{ flex: 1, padding: '32px', overflowY: 'auto' }}>
-        {tab === 'dashboard' && (
-          <>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 32 }}>لوحة التحكم</h1>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, marginBottom: 40 }}>
-              {cards.map(c => (
-                <div key={c.label} style={{ background: 'white', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: 8 }}>{c.icon}</div>
-                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: c.color, marginBottom: 4 }}>{c.value}</div>
-                  <div style={{ color: '#666', fontSize: '0.85rem' }}>{c.label}</div>
-                </div>
-              ))}
-            </div>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 16 }}>آخر الطلبات</h2>
-            <OrdersTable orders={orders.slice(0, 10)} updateStatus={updateStatus} />
-          </>
-        )}
-        {tab === 'orders' && (
-          <>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 32 }}>الطلبات ({orders.length})</h1>
-            <OrdersTable orders={orders} updateStatus={updateStatus} />
-          </>
-        )}
-        {tab === 'products' && (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 16 }}>المنتجات</h1>
-            <Link href="/admin/products">
-              <button style={{ background: '#1A1A1A', color: 'white', padding: '12px 32px', border: 'none', cursor: 'pointer', fontFamily: 'Cairo, sans-serif', borderRadius: 4 }}>
-                إدارة المنتجات
-              </button>
-            </Link>
-          </div>
-        )}
-      </main>
     </div>
   );
 }
@@ -305,7 +121,7 @@ function OrdersTable({ orders, updateStatus }) {
                   <td colSpan={9} style={{ padding: '16px 24px', background: '#fafafa', borderBottom: '1px solid #eee' }}>
                     <div style={{ marginBottom: 8, fontSize: '0.85rem', color: '#555' }}><strong>العنوان:</strong> {order.address}</div>
                     {order.notes && <div style={{ marginBottom: 8, fontSize: '0.85rem', color: '#555' }}><strong>ملاحظات:</strong> {order.notes}</div>}
-                    <div style={{ fontSize: '0.85rem', color: '#555' }}><strong>المنتجات:</strong></div>
+                    <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: 6 }}><strong>المنتجات:</strong></div>
                     {order.items?.map((item, i) => (
                       <div key={i} style={{ display: 'flex', gap: 16, padding: '6px 0', fontSize: '0.8rem', borderBottom: '1px solid #eee' }}>
                         <span>{item.name}</span>
@@ -325,6 +141,149 @@ function OrdersTable({ orders, updateStatus }) {
           )}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+export default function AdminDashboard() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [stats, setStats] = useState({ orders: 0, revenue: 0, products: 0, pending: 0 });
+  const [orders, setOrders] = useState([]);
+  const [tab, setTab] = useState('dashboard');
+  const [loading, setLoading] = useState(true);
+
+  // ✅ كل الـ Hooks أولاً قبل أي return
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const load = async () => {
+      try {
+        const ordersSnap = await getDocs(collection(db, 'orders'));
+        const productsSnap = await getDocs(collection(db, 'products'));
+        const ordersData = ordersSnap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => {
+            const dateA = a.createdAt?.toDate?.() || new Date(0);
+            const dateB = b.createdAt?.toDate?.() || new Date(0);
+            return dateB - dateA;
+          });
+        setOrders(ordersData);
+        setStats({
+          orders: ordersData.length,
+          revenue: ordersData.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0),
+          products: productsSnap.size,
+          pending: ordersData.filter(o => o.status === 'pending').length,
+        });
+      } catch (err) {
+        console.error('Error loading data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [isLoggedIn]);
+
+  const updateStatus = async (id, status) => {
+    await updateDoc(doc(db, 'orders', id), { status });
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    setStats(prev => ({
+      ...prev,
+      pending: orders.filter(o => (o.id === id ? status : o.status) === 'pending').length,
+    }));
+  };
+
+  // ✅ الـ return المبكر بعد كل الـ Hooks
+  if (!isLoggedIn) {
+    return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
+  }
+
+  if (loading) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Cairo, sans-serif' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '2rem', marginBottom: 12 }}>⏳</div>
+        <p>جاري التحميل...</p>
+      </div>
+    </div>
+  );
+
+  const cards = [
+    { label: 'إجمالي الطلبات', value: stats.orders, icon: '📦', color: '#1A1A1A' },
+    { label: 'الإيرادات', value: `${stats.revenue.toLocaleString()} جنيه`, icon: '💰', color: '#C9A96E' },
+    { label: 'المنتجات', value: stats.products, icon: '👗', color: '#1A1A1A' },
+    { label: 'طلبات معلقة', value: stats.pending, icon: '⏳', color: '#f59e0b' },
+  ];
+
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f5f5', fontFamily: 'Cairo, sans-serif', direction: 'rtl' }}>
+      {/* Sidebar */}
+      <aside style={{ width: 240, background: '#1A1A1A', color: 'white', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh' }}>
+        <div style={{ padding: '28px 24px', borderBottom: '1px solid #333' }}>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800 }}>تفصيلة</div>
+          <div style={{ fontSize: '0.55rem', letterSpacing: 4, color: '#C9A96E', marginTop: 2 }}>ADMIN PANEL</div>
+        </div>
+        <nav style={{ padding: '16px 12px', flex: 1 }}>
+          {[
+            { id: 'dashboard', label: 'لوحة التحكم', icon: '📊' },
+            { id: 'orders', label: 'الطلبات', icon: '📦' },
+            { id: 'products', label: 'المنتجات', icon: '👗' },
+          ].map(item => (
+            <button key={item.id} onClick={() => setTab(item.id)} style={{
+              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
+              padding: '12px 16px', background: tab === item.id ? '#C9A96E' : 'transparent',
+              border: 'none', color: 'white', cursor: 'pointer', borderRadius: 6,
+              marginBottom: 4, fontFamily: 'Cairo, sans-serif', fontSize: '0.9rem', fontWeight: 500
+            }}>
+              <span>{item.icon}</span>{item.label}
+            </button>
+          ))}
+        </nav>
+        <div style={{ padding: '16px 24px', borderTop: '1px solid #333', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <Link href="/" style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.85rem' }}>← العودة للموقع</Link>
+          <button onClick={() => setIsLoggedIn(false)}
+            style={{ background: 'none', border: '1px solid #444', color: '#aaa', padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontFamily: 'Cairo, sans-serif', fontSize: '0.8rem' }}>
+            🚪 تسجيل الخروج
+          </button>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <main style={{ flex: 1, padding: '32px', overflowY: 'auto' }}>
+        {tab === 'dashboard' && (
+          <>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 32 }}>لوحة التحكم</h1>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, marginBottom: 40 }}>
+              {cards.map(c => (
+                <div key={c.label} style={{ background: 'white', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                  <div style={{ fontSize: '2rem', marginBottom: 8 }}>{c.icon}</div>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: c.color, marginBottom: 4 }}>{c.value}</div>
+                  <div style={{ color: '#666', fontSize: '0.85rem' }}>{c.label}</div>
+                </div>
+              ))}
+            </div>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 16 }}>آخر الطلبات</h2>
+            <OrdersTable orders={orders.slice(0, 10)} updateStatus={updateStatus} />
+          </>
+        )}
+        {tab === 'orders' && (
+          <>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 32 }}>الطلبات ({orders.length})</h1>
+            <OrdersTable orders={orders} updateStatus={updateStatus} />
+          </>
+        )}
+        {tab === 'products' && (
+          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 16 }}>المنتجات</h1>
+            <Link href="/admin/products">
+              <button style={{ background: '#1A1A1A', color: 'white', padding: '12px 32px', border: 'none', cursor: 'pointer', fontFamily: 'Cairo, sans-serif', borderRadius: 4 }}>
+                إدارة المنتجات
+              </button>
+            </Link>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
