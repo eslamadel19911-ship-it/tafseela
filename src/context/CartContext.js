@@ -7,7 +7,6 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [mounted, setMounted] = useState(false);
 
-  // تحميل السلة من localStorage بعد ما المتصفح يكون جاهز فقط
   useEffect(() => {
     setMounted(true);
     try {
@@ -16,7 +15,6 @@ export function CartProvider({ children }) {
     } catch (e) {}
   }, []);
 
-  // حفظ السلة في localStorage عند كل تغيير
   useEffect(() => {
     if (!mounted) return;
     try {
@@ -31,7 +29,16 @@ export function CartProvider({ children }) {
         i.id === product.id && i.size === size && i.color === color
           ? { ...i, qty: i.qty + 1 } : i
       );
-      return [...prev, { ...product, size, color, qty: 1 }];
+      return [...prev, {
+        id: product.id,
+        name: product.name,
+        price: Number(product.price),
+        images: product.images || [],
+        colorImages: product.colorImages || {},
+        size,
+        color,
+        qty: 1
+      }];
     });
   };
 
@@ -45,13 +52,16 @@ export function CartProvider({ children }) {
     ));
   };
 
-  const clearCart = () => setItems([]);
+  const clearCart = () => {
+    setItems([]);
+    try { localStorage.removeItem('tafseela_cart'); } catch (e) {}
+  };
 
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = items.reduce((s, i) => s + Number(i.price) * i.qty, 0);
   const count = items.reduce((s, i) => s + i.qty, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQty, clearCart, total, count }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQty, clearCart, total, count, mounted }}>
       {children}
     </CartContext.Provider>
   );
