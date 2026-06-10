@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Navbar from '@/components/Navbar';
@@ -19,11 +20,20 @@ const CATEGORIES = [
 ];
 
 function ProductsContent() {
+  const searchParams = useSearchParams();
+  const urlCategory = searchParams.get('category');
+
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
-  const [category, setCategory] = useState('الكل');
+  const [category, setCategory] = useState(urlCategory || 'الكل');
   const [sort, setSort] = useState('newest');
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (urlCategory) {
+      setCategory(urlCategory);
+    }
+  }, [urlCategory]);
 
   useEffect(() => {
     getDocs(collection(db, 'products')).then((snap) => {
@@ -64,7 +74,7 @@ function ProductsContent() {
     padding: '8px 16px',
     border: '1px solid var(--border)',
     background: category === cat ? 'var(--dark)' : 'transparent',
-    color: category === cat ? 'white' : 'white',
+    color: category === cat ? 'white' : 'var(--dark)',
     cursor: 'pointer',
     fontSize: '0.82rem',
     fontFamily: 'Cairo, sans-serif',
@@ -85,6 +95,7 @@ function ProductsContent() {
           overflow-x: auto;
           display: flex;
           gap: 10px;
+          justify-content: center;
           scrollbar-width: none;
         }
 
@@ -123,10 +134,6 @@ function ProductsContent() {
         }
 
         @media (min-width: 1024px) {
-          .top-categories {
-            justify-content: center;
-          }
-
           .products-grid {
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
@@ -136,6 +143,16 @@ function ProductsContent() {
         @media (min-width: 1280px) {
           .products-grid {
             grid-template-columns: repeat(4, 1fr);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .top-categories {
+            display: none;
+          }
+
+          .container {
+            padding-top: 28px !important;
           }
         }
 

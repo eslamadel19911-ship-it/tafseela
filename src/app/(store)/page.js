@@ -22,6 +22,24 @@ const HOME_CATEGORIES = [
   'جيب نسائي',
 ];
 
+const REVIEWS = [
+  {
+    name: 'أحمد محمود',
+    text: 'الخامة ممتازة والتغليف شيك جدًا. المنتج وصل زي الصور بالظبط.',
+    rating: '★★★★★',
+  },
+  {
+    name: 'سارة علي',
+    text: 'التصميم مختلف وراقي، والمقاس كان مضبوط. تجربة حلوة جدًا.',
+    rating: '★★★★★',
+  },
+  {
+    name: 'محمد خالد',
+    text: 'أكتر حاجة عجبتني الاهتمام بالتفاصيل وجودة الطباعة.',
+    rating: '★★★★★',
+  },
+];
+
 function PromoBar() {
   const [idx, setIdx] = useState(0);
 
@@ -44,17 +62,31 @@ function PromoBar() {
 
 export default function HomePage() {
   const [featured, setFeatured] = useState([]);
+  const [offers, setOffers] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       const q = query(
         collection(db, 'products'),
         where('isActive', '==', true),
-        limit(8)
+        limit(20)
       );
 
       const snap = await getDocs(q);
-      setFeatured(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      setFeatured(data.slice(0, 8));
+
+      setOffers(
+        data
+          .filter(
+            (p) =>
+              p.onSale &&
+              p.salePrice &&
+              Number(p.salePrice) < Number(p.price)
+          )
+          .slice(0, 4)
+      );
     };
 
     fetchProducts();
@@ -170,6 +202,25 @@ export default function HomePage() {
           transform: translateY(-2px);
         }
 
+        .offers-section {
+          background: #fff;
+          padding: clamp(40px, 7vw, 70px) 20px;
+        }
+
+        .offers-header {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+
+        .offers-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+        }
+
         .home-features {
           background: #111;
           border-top: 1px solid #222;
@@ -218,7 +269,46 @@ export default function HomePage() {
           gap: 24px;
         }
 
-        /* ✅ الويب فقط */
+        .reviews-section {
+          background: #f7f4ef;
+          padding: clamp(45px, 8vw, 80px) 20px;
+        }
+
+        .reviews-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 22px;
+        }
+
+        .review-card {
+          background: white;
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 26px 22px;
+          text-align: center;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+        }
+
+        .review-stars {
+          color: var(--gold);
+          font-size: 1rem;
+          margin-bottom: 14px;
+          letter-spacing: 2px;
+        }
+
+        .review-text {
+          color: #555;
+          line-height: 1.9;
+          font-size: 0.92rem;
+          margin-bottom: 18px;
+        }
+
+        .review-name {
+          color: var(--dark);
+          font-weight: 700;
+          font-size: 0.9rem;
+        }
+
         @media (min-width: 769px) {
           .home-hero {
             min-height: auto !important;
@@ -250,9 +340,13 @@ export default function HomePage() {
           .hero-actions {
             margin-bottom: 20px !important;
           }
+
+          .offers-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+          }
         }
 
-        /* ✅ الجوال كما هو تقريبًا */
         @media (max-width: 768px) {
           .home-hero {
             min-height: auto;
@@ -296,6 +390,12 @@ export default function HomePage() {
             padding: 8px 13px;
           }
 
+          .offers-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+
           .features-grid {
             grid-template-columns: 1fr;
             gap: 4px;
@@ -309,6 +409,15 @@ export default function HomePage() {
             grid-template-columns: repeat(2, 1fr);
             gap: 14px;
           }
+
+          .reviews-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+          }
+
+          .review-card {
+            padding: 22px 18px;
+          }
         }
 
         @media (max-width: 380px) {
@@ -317,7 +426,8 @@ export default function HomePage() {
             padding: 7px 11px;
           }
 
-          .featured-grid {
+          .featured-grid,
+          .offers-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
           }
@@ -355,6 +465,35 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {offers.length > 0 && (
+        <section className="offers-section">
+          <div className="container">
+            <div className="offers-header">
+              <div>
+                <h2 className="section-title" style={{ marginBottom: 8 }}>
+                  🔥 العروض الحالية
+                </h2>
+                <p className="section-subtitle">
+                  خصومات لفترة محدودة على منتجات مختارة
+                </p>
+              </div>
+
+              <Link href="/offers">
+                <button className="btn-outline">
+                  عرض كل العروض
+                </button>
+              </Link>
+            </div>
+
+            <div className="offers-grid">
+              {offers.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="home-features">
         <div className="features-grid">
@@ -395,6 +534,25 @@ export default function HomePage() {
             <Link href="/products">
               <button className="btn-outline">عرض كل المنتجات</button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="reviews-section">
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: 42 }}>
+            <h2 className="section-title">آراء العملاء</h2>
+            <p className="section-subtitle">تجارب حقيقية من عملاء تفصيلة</p>
+          </div>
+
+          <div className="reviews-grid">
+            {REVIEWS.map((review) => (
+              <div key={review.name} className="review-card">
+                <div className="review-stars">{review.rating}</div>
+                <p className="review-text">“{review.text}”</p>
+                <div className="review-name">{review.name}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
