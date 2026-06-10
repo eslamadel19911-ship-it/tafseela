@@ -8,6 +8,28 @@ import { useCart } from '@/context/CartContext';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 
+// ✅ دالة لتنسيق النص — بتحول السطور لفقرات والنقاط لـ list
+function FormattedDescription({ text }) {
+  if (!text) return null;
+  const lines = text.split('\n').filter(l => l.trim());
+  return (
+    <div style={{ color: 'var(--gray)', fontSize: '0.9rem', lineHeight: 1.9 }}>
+      {lines.map((line, i) => {
+        const isBullet = line.trim().startsWith('-') || line.trim().startsWith('•');
+        if (isBullet) {
+          return (
+            <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6, alignItems: 'flex-start' }}>
+              <span style={{ color: 'var(--gold)', marginTop: 2, flexShrink: 0 }}>◆</span>
+              <span>{line.replace(/^[-•]\s*/, '')}</span>
+            </div>
+          );
+        }
+        return <p key={i} style={{ marginBottom: 10 }}>{line}</p>;
+      })}
+    </div>
+  );
+}
+
 function ProductContent({ params }) {
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState('');
@@ -39,82 +61,169 @@ function ProductContent({ params }) {
     setTimeout(() => setAdded(false), 2000);
   };
 
+  // ✅ الصورة الرئيسية تتغير مع اللون لو فيه colorImages
+  const currentImage = product.colorImages?.[selectedColor]
+    ? [product.colorImages[selectedColor], ...(product.images || [])]
+    : product.images;
+
   return (
     <>
       <Navbar />
-      <div className="container" style={{ padding: '60px 20px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
 
-          {/* Images */}
+      <style>{`
+        .product-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 48px;
+          align-items: start;
+        }
+
+        /* ✅ موبايل: عمود واحد */
+        @media (max-width: 768px) {
+          .product-layout {
+            grid-template-columns: 1fr;
+            gap: 24px;
+          }
+          .product-info {
+            padding: 0 !important;
+          }
+          .product-title {
+            font-size: 1.3rem !important;
+          }
+          .product-price {
+            font-size: 1.3rem !important;
+          }
+          .product-description-section {
+            margin-top: 24px !important;
+            padding-top: 24px !important;
+          }
+        }
+
+        /* ✅ الصور المصغرة تتمدد على الموبايل */
+        .thumbnails {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          margin-top: 12px;
+        }
+
+        .thumbnail {
+          width: 68px;
+          height: 88px;
+          cursor: pointer;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+          .thumbnail {
+            width: 56px;
+            height: 72px;
+          }
+        }
+      `}</style>
+
+      <div className="container" style={{ padding: '40px 16px 60px' }}>
+        <div className="product-layout">
+
+          {/* ✅ الصور */}
           <div>
-            <div style={{ paddingBottom: '120%', position: 'relative', background: '#f5f5f5', marginBottom: 12 }}>
-              {product.images?.[mainImg] && (
-                <img src={product.images[mainImg]} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{
+              paddingBottom: '120%', position: 'relative',
+              background: '#f5f5f5', borderRadius: 4, overflow: 'hidden'
+            }}>
+              {currentImage?.[mainImg] && (
+                <img
+                  src={currentImage[mainImg]}
+                  alt={product.name}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               )}
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {product.images?.map((img, i) => (
-                <div key={i} onClick={() => setMainImg(i)} style={{
-                  width: 70, height: 90, cursor: 'pointer',
-                  border: mainImg === i ? '2px solid var(--dark)' : '2px solid transparent', overflow: 'hidden'
-                }}>
-                  <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div className="thumbnails">
+              {currentImage?.map((img, i) => (
+                <div
+                  key={i}
+                  onClick={() => setMainImg(i)}
+                  className="thumbnail"
+                  style={{ border: mainImg === i ? '2px solid var(--dark)' : '2px solid transparent' }}
+                >
+                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Info */}
-          <div style={{ padding: '20px 0' }}>
-            <p style={{ color: 'var(--gray)', marginBottom: 8, fontSize: '0.85rem' }}>{product.category}</p>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: 16 }}>{product.name}</h1>
-            <p style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: 24 }}>
+          {/* ✅ المعلومات */}
+          <div className="product-info" style={{ padding: '8px 0' }}>
+            <p style={{ color: 'var(--gray)', marginBottom: 6, fontSize: '0.82rem' }}>{product.category}</p>
+
+            <h1 className="product-title" style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: 14, lineHeight: 1.4 }}>
+              {product.name}
+            </h1>
+
+            <p className="product-price" style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 28, color: 'var(--dark)' }}>
               {product.price?.toLocaleString()} جنيه
             </p>
 
-            {/* Colors */}
+            {/* الألوان */}
             {product.colors?.length > 0 && (
-              <div style={{ marginBottom: 24 }}>
-                <p style={{ fontWeight: 600, marginBottom: 12, fontSize: '0.9rem' }}>اللون: {selectedColor}</p>
-                <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ marginBottom: 22 }}>
+                <p style={{ fontWeight: 600, marginBottom: 10, fontSize: '0.88rem' }}>
+                  اللون: <span style={{ fontWeight: 400 }}>{selectedColor}</span>
+                </p>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {product.colors.map(c => (
-                    <button key={c} onClick={() => setSelectedColor(c)} style={{
-                      padding: '6px 16px',
+                    <button key={c} onClick={() => { setSelectedColor(c); setMainImg(0); }} style={{
+                      padding: '7px 16px',
                       border: selectedColor === c ? '2px solid var(--dark)' : '1px solid var(--border)',
-                      background: 'white', cursor: 'pointer', fontFamily: 'Cairo, sans-serif', fontSize: '0.8rem'
+                      background: 'white', cursor: 'pointer',
+                      fontFamily: 'Cairo, sans-serif', fontSize: '0.82rem',
+                      borderRadius: 3,
                     }}>{c}</button>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Sizes */}
+            {/* المقاسات */}
             {product.sizes?.length > 0 && (
-              <div style={{ marginBottom: 32 }}>
-                <p style={{ fontWeight: 600, marginBottom: 12, fontSize: '0.9rem' }}>المقاس: {selectedSize}</p>
-                <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ marginBottom: 28 }}>
+                <p style={{ fontWeight: 600, marginBottom: 10, fontSize: '0.88rem' }}>
+                  المقاس: <span style={{ fontWeight: 400 }}>{selectedSize}</span>
+                </p>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {product.sizes.map(s => (
                     <button key={s} onClick={() => setSelectedSize(s)} style={{
                       width: 44, height: 44,
                       border: selectedSize === s ? '2px solid var(--dark)' : '1px solid var(--border)',
-                      background: 'white', cursor: 'pointer', fontFamily: 'Cairo, sans-serif', fontWeight: 600
+                      background: 'white', cursor: 'pointer',
+                      fontFamily: 'Cairo, sans-serif', fontWeight: 600,
+                      borderRadius: 3,
                     }}>{s}</button>
                   ))}
                 </div>
               </div>
             )}
 
-            <button onClick={handleAdd} className="btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1rem' }}>
+            <button
+              onClick={handleAdd}
+              className="btn-primary"
+              style={{ width: '100%', padding: '15px', fontSize: '1rem', borderRadius: 3 }}
+            >
               {added ? '✓ تمت الإضافة للسلة' : 'أضف للسلة'}
             </button>
 
-            <div style={{ marginTop: 32, paddingTop: 32, borderTop: '1px solid var(--border)' }}>
-              <h3 style={{ marginBottom: 12, fontWeight: 600 }}>التفاصيل</h3>
-              <p style={{ color: 'var(--gray)', lineHeight: 2, fontSize: '0.9rem' }}>{product.description}</p>
+            {/* ✅ التفاصيل منسقة */}
+            <div className="product-description-section" style={{ marginTop: 32, paddingTop: 28, borderTop: '1px solid var(--border)' }}>
+              <h3 style={{ marginBottom: 16, fontWeight: 700, fontSize: '1rem' }}>التفاصيل</h3>
+              <FormattedDescription text={product.description} />
             </div>
           </div>
+
         </div>
       </div>
+
       <Footer />
     </>
   );
