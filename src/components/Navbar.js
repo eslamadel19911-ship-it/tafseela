@@ -16,21 +16,22 @@ export default function Navbar() {
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'var(--dark)', borderBottom: '1px solid #333',
-        padding: '0 20px'
       }}>
+        {/* الصف العلوي */}
         <div className="container" style={{
           display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between', height: 70
+          justifyContent: 'space-between', height: 64,
+          padding: '0 16px'
         }}>
 
           {/* اللوجو */}
           <Link href="/" style={{ textDecoration: 'none' }}>
             <img src="/logo.png" alt="تفصيلة"
-              style={{ height: 50, width: 'auto', objectFit: 'contain' }}
+              style={{ height: 46, width: 'auto', objectFit: 'contain' }}
             />
           </Link>
 
-          {/* الروابط - Desktop */}
+          {/* الروابط - Desktop فقط */}
           <div className="nav-links-desktop" style={{ display: 'flex', gap: 32 }}>
             {[['/', 'الرئيسية'], ['/products', 'المنتجات'], ['/about', 'من نحن']].map(([href, label]) => (
               <Link key={href} href={href} style={{
@@ -43,13 +44,27 @@ export default function Navbar() {
           {/* أيقونات اليمين */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
 
-            {/* دخول - Desktop فقط */}
-            <div className="nav-login-desktop">
+            {/* Desktop: طلباتي + دخول/خروج */}
+            <div className="nav-login-desktop" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               {user ? (
-                <button onClick={logout} style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#aaa', fontSize: '0.85rem', fontFamily: 'Cairo, sans-serif'
-                }}>خروج</button>
+                <>
+                  {/* ✅ رابط طلباتي */}
+                  <Link href="/my-orders" style={{
+                    color: '#ddd', fontSize: '0.85rem', textDecoration: 'none',
+                    display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap'
+                  }}>
+                    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                      <rect x="9" y="3" width="6" height="4" rx="1"/>
+                      <path d="M9 12h6M9 16h4"/>
+                    </svg>
+                    طلباتي
+                  </Link>
+                  <button onClick={logout} style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: '#aaa', fontSize: '0.85rem', fontFamily: 'Cairo, sans-serif'
+                  }}>خروج</button>
+                </>
               ) : (
                 <Link href="/login" style={{ color: '#aaa', fontSize: '0.85rem', textDecoration: 'none' }}>
                   دخول
@@ -76,7 +91,7 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* زر الهامبرجر - Mobile فقط */}
+            {/* هامبرجر - Mobile */}
             <button className="nav-hamburger" onClick={() => setMenuOpen(!menuOpen)} style={{
               background: 'none', border: 'none', cursor: 'pointer', padding: 4,
               display: 'none', flexDirection: 'column', gap: 5
@@ -91,38 +106,91 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="nav-mobile-menu" style={{
-            background: '#111', borderTop: '1px solid #333',
-            padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 16
+        {/* شريط روابط موبايل */}
+        <div className="nav-mobile-bar" style={{ display: 'none' }}>
+          <div style={{
+            display: 'flex', borderTop: '1px solid #2a2a2a',
+            background: '#111'
           }}>
             {[['/', 'الرئيسية'], ['/products', 'المنتجات'], ['/about', 'من نحن']].map(([href, label]) => (
-              <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{
-                textDecoration: 'none', color: 'white', fontSize: '1rem', fontWeight: 500
+              <Link key={href} href={href} style={{
+                flex: 1, textAlign: 'center', padding: '12px 4px',
+                textDecoration: 'none', color: 'white',
+                fontSize: '0.82rem', fontWeight: 500,
+                borderLeft: '1px solid #2a2a2a',
               }}>{label}</Link>
             ))}
+          </div>
+
+          {/* Sub-categories */}
+          <div style={{
+            display: 'flex', gap: 8, padding: '10px 16px',
+            background: '#0d0d0d', overflowX: 'auto',
+            borderTop: '1px solid #222',
+          }}>
+            {[
+              'تيشرتات رجالي', 'هوديز رجالي', 'بناطيل رجالي',
+              'هوديز نسائي', 'جيب نسائي'
+            ].map(cat => (
+              <Link key={cat} href={`/products?category=${encodeURIComponent(cat)}`} style={{
+                textDecoration: 'none', color: '#aaa',
+                fontSize: '0.75rem', whiteSpace: 'nowrap',
+                padding: '5px 12px', border: '1px solid #333',
+                borderRadius: 20, flexShrink: 0,
+              }}>{cat}</Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Dropdown — دخول / خروج / طلباتي */}
+        {menuOpen && (
+          <div style={{
+            background: '#111', borderTop: '1px solid #333',
+            padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: 4
+          }}>
             {user ? (
-              <button onClick={() => { logout(); setMenuOpen(false); }} style={{
-                background: 'none', border: 'none', cursor: 'pointer', color: '#aaa',
-                fontSize: '0.9rem', fontFamily: 'Cairo, sans-serif', textAlign: 'right', padding: 0
-              }}>خروج</button>
+              <>
+                {/* ✅ طلباتي في الموبايل */}
+                <Link href="/my-orders" onClick={() => setMenuOpen(false)} style={{
+                  color: '#ddd', fontSize: '0.9rem', textDecoration: 'none',
+                  padding: '10px 0', borderBottom: '1px solid #222',
+                  display: 'flex', alignItems: 'center', gap: 8
+                }}>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                    <path d="M9 12h6M9 16h4"/>
+                  </svg>
+                  طلباتي
+                </Link>
+                <button onClick={() => { logout(); setMenuOpen(false); }} style={{
+                  background: 'none', border: 'none', cursor: 'pointer', color: '#aaa',
+                  fontSize: '0.9rem', fontFamily: 'Cairo, sans-serif',
+                  textAlign: 'right', padding: '10px 0'
+                }}>خروج</button>
+              </>
             ) : (
               <Link href="/login" onClick={() => setMenuOpen(false)} style={{
-                color: '#aaa', fontSize: '0.9rem', textDecoration: 'none'
+                color: '#aaa', fontSize: '0.9rem', textDecoration: 'none', padding: '10px 0'
               }}>دخول</Link>
             )}
           </div>
         )}
       </nav>
 
-      {/* CSS للموبايل */}
       <style>{`
         @media (max-width: 768px) {
           .nav-links-desktop { display: none !important; }
           .nav-login-desktop { display: none !important; }
           .nav-hamburger { display: flex !important; }
+          .nav-mobile-bar { display: block !important; }
         }
+        .nav-mobile-bar a:hover {
+          color: var(--gold) !important;
+          background: rgba(255,255,255,0.04);
+        }
+        .nav-mobile-bar div:last-child::-webkit-scrollbar { display: none; }
+        .nav-mobile-bar div:last-child { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
       <CartDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
