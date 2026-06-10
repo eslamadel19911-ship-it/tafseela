@@ -88,8 +88,9 @@ function OrdersTable({ orders, updateStatus }) {
         </thead>
         <tbody>
           {orders.map(order => (
-            <>
-              <tr key={order.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+            // ✅ React.Fragment بدل <> عشان نقدر نحط key
+            <React.Fragment key={order.id}>
+              <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
                 <td style={{ padding: '12px 16px', fontWeight: 600, color: '#C9A96E', fontSize: '0.75rem' }}>#{order.id.slice(-6).toUpperCase()}</td>
                 <td style={{ padding: '12px 16px' }}>{order.customerName}</td>
                 <td style={{ padding: '12px 16px', direction: 'ltr' }}>{order.phone}</td>
@@ -104,8 +105,14 @@ function OrdersTable({ orders, updateStatus }) {
                   {order.createdAt?.toDate?.()?.toLocaleDateString('ar-EG') || '—'}
                 </td>
                 <td style={{ padding: '12px 16px' }}>
-                  <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)}
-                    style={{ padding: '4px 8px', border: '1px solid #ddd', borderRadius: 4, fontFamily: 'Cairo, sans-serif', fontSize: '0.75rem' }}>
+                  {/* ✅ الحل — e.stopPropagation عشان مش يتعارض مع حاجة تانية */}
+                  <select
+                    value={order.status}
+                    onChange={e => {
+                      e.stopPropagation();
+                      updateStatus(order.id, e.target.value);
+                    }}
+                    style={{ padding: '6px 10px', border: '1px solid #ddd', borderRadius: 4, fontFamily: 'Cairo, sans-serif', fontSize: '0.75rem', cursor: 'pointer', background: 'white' }}>
                     {Object.entries(STATUS_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </td>
@@ -117,7 +124,7 @@ function OrdersTable({ orders, updateStatus }) {
                 </td>
               </tr>
               {expanded === order.id && (
-                <tr key={order.id + '_detail'}>
+                <tr>
                   <td colSpan={9} style={{ padding: '16px 24px', background: '#fafafa', borderBottom: '1px solid #eee' }}>
                     <div style={{ marginBottom: 8, fontSize: '0.85rem', color: '#555' }}><strong>العنوان:</strong> {order.address}</div>
                     {order.notes && <div style={{ marginBottom: 8, fontSize: '0.85rem', color: '#555' }}><strong>ملاحظات:</strong> {order.notes}</div>}
@@ -134,7 +141,7 @@ function OrdersTable({ orders, updateStatus }) {
                   </td>
                 </tr>
               )}
-            </>
+            </React.Fragment>
           ))}
           {orders.length === 0 && (
             <tr><td colSpan={9} style={{ padding: 40, textAlign: 'center', color: '#aaa' }}>لا توجد طلبات بعد</td></tr>
@@ -152,7 +159,6 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState('dashboard');
   const [loading, setLoading] = useState(true);
 
-  // ✅ كل الـ Hooks أولاً قبل أي return
   useEffect(() => {
     if (!isLoggedIn) {
       setLoading(false);
@@ -186,16 +192,20 @@ export default function AdminDashboard() {
     load();
   }, [isLoggedIn]);
 
-  const updateStatus = async (id, status) => {
-    await updateDoc(doc(db, 'orders', id), { status });
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-    setStats(prev => ({
-      ...prev,
-      pending: orders.filter(o => (o.id === id ? status : o.status) === 'pending').length,
-    }));
+  const updateStatus = async (orderId, status) => {
+    try {
+      await updateDoc(doc(db, 'orders', orderId), { status });
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+      setStats(prev => ({
+        ...prev,
+        pending: prev.orders - [...orders.filter(o => o.id !== orderId), { status }].filter(o => o.status !== 'pending').length,
+      }));
+    } catch (err) {
+      console.error('Error updating status:', err);
+      alert('حدث خطأ أثناء تحديث الحالة');
+    }
   };
 
-  // ✅ الـ return المبكر بعد كل الـ Hooks
   if (!isLoggedIn) {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
   }
