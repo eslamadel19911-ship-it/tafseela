@@ -5,28 +5,23 @@ import { db } from '@/lib/firebase';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
-import { CartProvider } from '@/context/CartContext';
-import { AuthProvider } from '@/context/AuthContext';
 
 // ✅ تنسيق النص الذكي — بيتعامل مع النص العادي والنقاط والعناوين
 function FormattedDescription({ text }) {
   if (!text) return null;
 
-  // تقسيم بالجملة لو مفيش سطور جديدة
   const hasNewlines = text.includes('\n');
   let lines;
 
   if (hasNewlines) {
     lines = text.split('\n').filter(l => l.trim());
   } else {
-    // نص بدون سطور — نقسمه على الجمل الطويلة والنقاط المنطقية
     lines = text
       .split(/[.،]\s+/)
       .filter(l => l.trim())
       .map((l, i, arr) => i < arr.length - 1 ? l + '.' : l);
   }
 
-  // كلمات مفتاحية للعناوين
   const headingKeywords = ['مميزات', 'خامة', 'التنسيق', 'طريقة', 'العناية', 'الغسيل', 'المقاسات', 'ملاحظة'];
 
   return (
@@ -281,15 +276,15 @@ function ProductContent({ params }) {
               {activeTab === 'care' && (
                 <div style={{ fontSize: '0.9rem', lineHeight: 1.9, color: 'var(--gray)' }}>
                   {[
-                    '◆ يُغسل بماء بارد للحفاظ على جودة الطباعة',
-                    '◆ يُفضل قلب التيشيرت قبل الغسيل',
-                    '◆ لا تستخدم المبيض أو منظفات قاسية',
-                    '◆ تجفيف في الهواء أو على حرارة منخفضة',
-                    '◆ الكي من الجهة الداخلية فقط',
+                    'يُغسل بماء بارد للحفاظ على جودة الطباعة',
+                    'يُفضل قلب التيشيرت قبل الغسيل',
+                    'لا تستخدم المبيض أو منظفات قاسية',
+                    'تجفيف في الهواء أو على حرارة منخفضة',
+                    'الكي من الجهة الداخلية فقط',
                   ].map((item, i) => (
                     <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'flex-start' }}>
                       <span style={{ color: 'var(--gold)', flexShrink: 0 }}>◆</span>
-                      <span>{item.replace('◆ ', '')}</span>
+                      <span>{item}</span>
                     </div>
                   ))}
                 </div>
@@ -323,12 +318,7 @@ function ProductContent({ params }) {
   );
 }
 
+// ✅ بدون AuthProvider / CartProvider — بييجوا من layout.jsx
 export default function ProductDetail({ params }) {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <ProductContent params={params} />
-      </CartProvider>
-    </AuthProvider>
-  );
+  return <ProductContent params={params} />;
 }
