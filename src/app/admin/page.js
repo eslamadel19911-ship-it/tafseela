@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
@@ -8,12 +8,19 @@ const ADMIN_USERNAME = 'tafseela';
 const ADMIN_PASSWORD = 'Tafseela@2025';
 
 const STATUS_COLORS = {
-  pending: '#f59e0b', confirmed: '#3b82f6',
-  shipped: '#8b5cf6', delivered: '#10b981', cancelled: '#ef4444',
+  pending: '#f59e0b',
+  confirmed: '#3b82f6',
+  shipped: '#8b5cf6',
+  delivered: '#10b981',
+  cancelled: '#ef4444',
 };
+
 const STATUS_LABELS = {
-  pending: 'قيد المراجعة', confirmed: 'تم التأكيد',
-  shipped: 'تم الشحن', delivered: 'تم التسليم', cancelled: 'ملغي',
+  pending: 'قيد المراجعة',
+  confirmed: 'تم التأكيد',
+  shipped: 'تم الشحن',
+  delivered: 'تم التسليم',
+  cancelled: 'ملغي',
 };
 
 function LoginScreen({ onLogin }) {
@@ -33,39 +40,126 @@ function LoginScreen({ onLogin }) {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: '#1A1A1A', fontFamily: 'Cairo, sans-serif', direction: 'rtl'
-    }}>
-      <div style={{ background: 'white', padding: '48px 40px', borderRadius: 12, width: '100%', maxWidth: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#1A1A1A',
+        fontFamily: 'Cairo, sans-serif',
+        direction: 'rtl',
+      }}
+    >
+      <div
+        style={{
+          background: 'white',
+          padding: '48px 40px',
+          borderRadius: 12,
+          width: '100%',
+          maxWidth: 400,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+        }}
+      >
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{ fontSize: '1.8rem', fontWeight: 800 }}>تفصيلة</div>
-          <div style={{ fontSize: '0.6rem', letterSpacing: 4, color: '#C9A96E', marginTop: 4 }}>ADMIN PANEL</div>
+          <div style={{ fontSize: '0.6rem', letterSpacing: 4, color: '#C9A96E', marginTop: 4 }}>
+            ADMIN PANEL
+          </div>
         </div>
+
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', fontWeight: 600 }}>اسم المستخدم</label>
-            <input value={username} onChange={e => setUsername(e.target.value)} required autoComplete="username"
-              style={{ width: '100%', padding: '11px 14px', border: '1px solid #ddd', borderRadius: 6, fontFamily: 'Cairo, sans-serif', fontSize: '0.95rem' }} />
+            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', fontWeight: 600 }}>
+              اسم المستخدم
+            </label>
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              autoComplete="username"
+              style={{
+                width: '100%',
+                padding: '11px 14px',
+                border: '1px solid #ddd',
+                borderRadius: 6,
+                fontFamily: 'Cairo, sans-serif',
+                fontSize: '0.95rem',
+              }}
+            />
           </div>
+
           <div style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', fontWeight: 600 }}>كلمة المرور</label>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', fontWeight: 600 }}>
+              كلمة المرور
+            </label>
             <div style={{ position: 'relative' }}>
-              <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password"
-                style={{ width: '100%', padding: '11px 44px 11px 14px', border: '1px solid #ddd', borderRadius: 6, fontFamily: 'Cairo, sans-serif', fontSize: '0.95rem' }} />
-              <button type="button" onClick={() => setShowPass(!showPass)}
-                style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: '#888' }}>
+              <input
+                type={showPass ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                style={{
+                  width: '100%',
+                  padding: '11px 44px 11px 14px',
+                  border: '1px solid #ddd',
+                  borderRadius: 6,
+                  fontFamily: 'Cairo, sans-serif',
+                  fontSize: '0.95rem',
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                style={{
+                  position: 'absolute',
+                  left: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  color: '#888',
+                }}
+              >
                 {showPass ? '🙈' : '👁️'}
               </button>
             </div>
           </div>
+
           {error && (
-            <div style={{ background: '#fee2e2', color: '#ef4444', padding: '10px 14px', borderRadius: 6, fontSize: '0.85rem', marginBottom: 16, textAlign: 'center' }}>
+            <div
+              style={{
+                background: '#fee2e2',
+                color: '#ef4444',
+                padding: '10px 14px',
+                borderRadius: 6,
+                fontSize: '0.85rem',
+                marginBottom: 16,
+                textAlign: 'center',
+              }}
+            >
               ❌ {error}
             </div>
           )}
-          <button type="submit"
-            style={{ width: '100%', padding: '13px', background: '#1A1A1A', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'Cairo, sans-serif', fontSize: '1rem', fontWeight: 600 }}>
+
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              padding: '13px',
+              background: '#1A1A1A',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              cursor: 'pointer',
+              fontFamily: 'Cairo, sans-serif',
+              fontSize: '1rem',
+              fontWeight: 600,
+            }}
+          >
             دخول
           </button>
         </form>
@@ -76,28 +170,47 @@ function LoginScreen({ onLogin }) {
 
 function OrdersTable({ orders, updateStatus }) {
   const [expanded, setExpanded] = useState(null);
+
   return (
     <div style={{ background: 'white', borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
         <thead>
           <tr style={{ background: '#f9f7f4', borderBottom: '1px solid #eee' }}>
-            {['رقم الطلب', 'العميل', 'الهاتف', 'المبلغ', 'الدفع', 'الحالة', 'التاريخ', 'تغيير الحالة', 'تفاصيل'].map(h => (
-              <th key={h} style={{ padding: '14px 16px', textAlign: 'right', fontWeight: 600, color: '#555', whiteSpace: 'nowrap' }}>{h}</th>
+            {['رقم الطلب', 'العميل', 'الهاتف', 'المبلغ', 'الدفع', 'الحالة', 'التاريخ', 'تغيير الحالة', 'تفاصيل'].map((h) => (
+              <th
+                key={h}
+                style={{ padding: '14px 16px', textAlign: 'right', fontWeight: 600, color: '#555', whiteSpace: 'nowrap' }}
+              >
+                {h}
+              </th>
             ))}
           </tr>
         </thead>
+
         <tbody>
-          {orders.map(order => (
-            // ✅ React.Fragment بدل <> عشان نقدر نحط key
+          {orders.map((order) => (
             <React.Fragment key={order.id}>
               <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <td style={{ padding: '12px 16px', fontWeight: 600, color: '#C9A96E', fontSize: '0.75rem' }}>#{order.id.slice(-6).toUpperCase()}</td>
+                <td style={{ padding: '12px 16px', fontWeight: 600, color: '#C9A96E', fontSize: '0.75rem' }}>
+                  #{order.id.slice(-6).toUpperCase()}
+                </td>
                 <td style={{ padding: '12px 16px' }}>{order.customerName}</td>
                 <td style={{ padding: '12px 16px', direction: 'ltr' }}>{order.phone}</td>
                 <td style={{ padding: '12px 16px', fontWeight: 700 }}>{order.total?.toLocaleString()} ج</td>
-                <td style={{ padding: '12px 16px', fontSize: '0.75rem' }}>{order.paymentMethod === 'cod' ? 'عند الاستلام' : order.paymentMethod}</td>
+                <td style={{ padding: '12px 16px', fontSize: '0.75rem' }}>
+                  {order.paymentMethod === 'cod' ? 'عند الاستلام' : order.paymentMethod}
+                </td>
                 <td style={{ padding: '12px 16px' }}>
-                  <span style={{ background: STATUS_COLORS[order.status] + '20', color: STATUS_COLORS[order.status], padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600 }}>
+                  <span
+                    style={{
+                      background: `${STATUS_COLORS[order.status]}20`,
+                      color: STATUS_COLORS[order.status],
+                      padding: '4px 12px',
+                      borderRadius: 20,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                    }}
+                  >
                     {STATUS_LABELS[order.status]}
                   </span>
                 </td>
@@ -105,32 +218,66 @@ function OrdersTable({ orders, updateStatus }) {
                   {order.createdAt?.toDate?.()?.toLocaleDateString('ar-EG') || '—'}
                 </td>
                 <td style={{ padding: '12px 16px' }}>
-                  {/* ✅ الحل — e.stopPropagation عشان مش يتعارض مع حاجة تانية */}
                   <select
                     value={order.status}
-                    onChange={e => {
+                    onChange={(e) => {
                       e.stopPropagation();
                       updateStatus(order.id, e.target.value);
                     }}
-                    style={{ padding: '6px 10px', border: '1px solid #ddd', borderRadius: 4, fontFamily: 'Cairo, sans-serif', fontSize: '0.75rem', cursor: 'pointer', background: 'white' }}>
-                    {Object.entries(STATUS_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                    style={{
+                      padding: '6px 10px',
+                      border: '1px solid #ddd',
+                      borderRadius: 4,
+                      fontFamily: 'Cairo, sans-serif',
+                      fontSize: '0.75rem',
+                      cursor: 'pointer',
+                      background: 'white',
+                    }}
+                  >
+                    {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
                   </select>
                 </td>
                 <td style={{ padding: '12px 16px' }}>
-                  <button onClick={() => setExpanded(expanded === order.id ? null : order.id)}
-                    style={{ background: 'none', border: '1px solid #ddd', borderRadius: 4, padding: '4px 10px', cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'Cairo, sans-serif' }}>
+                  <button
+                    onClick={() => setExpanded(expanded === order.id ? null : order.id)}
+                    style={{
+                      background: 'none',
+                      border: '1px solid #ddd',
+                      borderRadius: 4,
+                      padding: '4px 10px',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      fontFamily: 'Cairo, sans-serif',
+                    }}
+                  >
                     {expanded === order.id ? 'إخفاء' : 'عرض'}
                   </button>
                 </td>
               </tr>
+
               {expanded === order.id && (
                 <tr>
                   <td colSpan={9} style={{ padding: '16px 24px', background: '#fafafa', borderBottom: '1px solid #eee' }}>
-                    <div style={{ marginBottom: 8, fontSize: '0.85rem', color: '#555' }}><strong>العنوان:</strong> {order.address}</div>
-                    {order.notes && <div style={{ marginBottom: 8, fontSize: '0.85rem', color: '#555' }}><strong>ملاحظات:</strong> {order.notes}</div>}
-                    <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: 6 }}><strong>المنتجات:</strong></div>
+                    <div style={{ marginBottom: 8, fontSize: '0.85rem', color: '#555' }}>
+                      <strong>العنوان:</strong> {order.address}
+                    </div>
+                    {order.notes && (
+                      <div style={{ marginBottom: 8, fontSize: '0.85rem', color: '#555' }}>
+                        <strong>ملاحظات:</strong> {order.notes}
+                      </div>
+                    )}
+                    <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: 6 }}>
+                      <strong>المنتجات:</strong>
+                    </div>
                     {order.items?.map((item, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 16, padding: '6px 0', fontSize: '0.8rem', borderBottom: '1px solid #eee' }}>
+                      <div
+                        key={i}
+                        style={{ display: 'flex', gap: 16, padding: '6px 0', fontSize: '0.8rem', borderBottom: '1px solid #eee' }}
+                      >
                         <span>{item.name}</span>
                         {item.size && <span>المقاس: {item.size}</span>}
                         {item.color && <span>اللون: {item.color}</span>}
@@ -143,8 +290,13 @@ function OrdersTable({ orders, updateStatus }) {
               )}
             </React.Fragment>
           ))}
+
           {orders.length === 0 && (
-            <tr><td colSpan={9} style={{ padding: 40, textAlign: 'center', color: '#aaa' }}>لا توجد طلبات بعد</td></tr>
+            <tr>
+              <td colSpan={9} style={{ padding: 40, textAlign: 'center', color: '#aaa' }}>
+                لا توجد طلبات بعد
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
@@ -164,24 +316,28 @@ export default function AdminDashboard() {
       setLoading(false);
       return;
     }
+
     setLoading(true);
+
     const load = async () => {
       try {
         const ordersSnap = await getDocs(collection(db, 'orders'));
         const productsSnap = await getDocs(collection(db, 'products'));
+
         const ordersData = ordersSnap.docs
-          .map(d => ({ id: d.id, ...d.data() }))
+          .map((d) => ({ id: d.id, ...d.data() }))
           .sort((a, b) => {
             const dateA = a.createdAt?.toDate?.() || new Date(0);
             const dateB = b.createdAt?.toDate?.() || new Date(0);
             return dateB - dateA;
           });
+
         setOrders(ordersData);
         setStats({
           orders: ordersData.length,
-          revenue: ordersData.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0),
+          revenue: ordersData.filter((o) => o.status !== 'cancelled').reduce((sum, o) => sum + (o.total || 0), 0),
           products: productsSnap.size,
-          pending: ordersData.filter(o => o.status === 'pending').length,
+          pending: ordersData.filter((o) => o.status === 'pending').length,
         });
       } catch (err) {
         console.error('Error loading data:', err);
@@ -189,17 +345,22 @@ export default function AdminDashboard() {
         setLoading(false);
       }
     };
+
     load();
   }, [isLoggedIn]);
 
   const updateStatus = async (orderId, status) => {
     try {
       await updateDoc(doc(db, 'orders', orderId), { status });
-      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
-      setStats(prev => ({
-        ...prev,
-        pending: prev.orders - [...orders.filter(o => o.id !== orderId), { status }].filter(o => o.status !== 'pending').length,
-      }));
+
+      setOrders((prev) => {
+        const updated = prev.map((o) => (o.id === orderId ? { ...o, status } : o));
+        setStats((statsPrev) => ({
+          ...statsPrev,
+          pending: updated.filter((o) => o.status === 'pending').length,
+        }));
+        return updated;
+      });
     } catch (err) {
       console.error('Error updating status:', err);
       alert('حدث خطأ أثناء تحديث الحالة');
@@ -210,14 +371,24 @@ export default function AdminDashboard() {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
   }
 
-  if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Cairo, sans-serif' }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem', marginBottom: 12 }}>⏳</div>
-        <p>جاري التحميل...</p>
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'Cairo, sans-serif',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: 12 }}>⏳</div>
+          <p>جاري التحميل...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   const cards = [
     { label: 'إجمالي الطلبات', value: stats.orders, icon: '📦', color: '#1A1A1A' },
@@ -228,48 +399,87 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f5f5', fontFamily: 'Cairo, sans-serif', direction: 'rtl' }}>
-      {/* Sidebar */}
-      <aside style={{ width: 240, background: '#1A1A1A', color: 'white', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh' }}>
+      <aside
+        style={{
+          width: 240,
+          background: '#1A1A1A',
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+        }}
+      >
         <div style={{ padding: '28px 24px', borderBottom: '1px solid #333' }}>
           <div style={{ fontSize: '1.3rem', fontWeight: 800 }}>تفصيلة</div>
           <div style={{ fontSize: '0.55rem', letterSpacing: 4, color: '#C9A96E', marginTop: 2 }}>ADMIN PANEL</div>
         </div>
+
         <nav style={{ padding: '16px 12px', flex: 1 }}>
           {[
             { id: 'dashboard', label: 'لوحة التحكم', icon: '📊' },
             { id: 'orders', label: 'الطلبات', icon: '📦' },
             { id: 'products', label: 'المنتجات', icon: '👗' },
-          ].map(item => (
-            <button key={item.id} onClick={() => setTab(item.id)} style={{
-              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-              padding: '12px 16px', background: tab === item.id ? '#C9A96E' : 'transparent',
-              border: 'none', color: 'white', cursor: 'pointer', borderRadius: 6,
-              marginBottom: 4, fontFamily: 'Cairo, sans-serif', fontSize: '0.9rem', fontWeight: 500
-            }}>
-              <span>{item.icon}</span>{item.label}
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setTab(item.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                width: '100%',
+                padding: '12px 16px',
+                background: tab === item.id ? '#C9A96E' : 'transparent',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer',
+                borderRadius: 6,
+                marginBottom: 4,
+                fontFamily: 'Cairo, sans-serif',
+                fontSize: '0.9rem',
+                fontWeight: 500,
+              }}
+            >
+              <span>{item.icon}</span>
+              {item.label}
             </button>
           ))}
         </nav>
+
         <div style={{ padding: '16px 24px', borderTop: '1px solid #333', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Link href="/" style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.85rem' }}>← العودة للموقع</Link>
-          <button onClick={() => setIsLoggedIn(false)}
-            style={{ background: 'none', border: '1px solid #444', color: '#aaa', padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontFamily: 'Cairo, sans-serif', fontSize: '0.8rem' }}>
+          <Link href="/" style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.85rem' }}>
+            ← العودة للموقع
+          </Link>
+          <button
+            onClick={() => setIsLoggedIn(false)}
+            style={{
+              background: 'none',
+              border: '1px solid #444',
+              color: '#aaa',
+              padding: '6px 12px',
+              borderRadius: 4,
+              cursor: 'pointer',
+              fontFamily: 'Cairo, sans-serif',
+              fontSize: '0.8rem',
+            }}
+          >
             🚪 تسجيل الخروج
           </button>
         </div>
       </aside>
 
-      {/* Main */}
       <main style={{ flex: 1, padding: '32px', overflowY: 'auto' }}>
         {tab === 'dashboard' && (
           <>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 32 }}>لوحة التحكم</h1>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, marginBottom: 40 }}>
-              {cards.map(c => (
-                <div key={c.label} style={{ background: 'white', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: 8 }}>{c.icon}</div>
-                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: c.color, marginBottom: 4 }}>{c.value}</div>
-                  <div style={{ color: '#666', fontSize: '0.85rem' }}>{c.label}</div>
+              {cards.map((card) => (
+                <div key={card.label} style={{ background: 'white', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                  <div style={{ fontSize: '2rem', marginBottom: 8 }}>{card.icon}</div>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: card.color, marginBottom: 4 }}>{card.value}</div>
+                  <div style={{ color: '#666', fontSize: '0.85rem' }}>{card.label}</div>
                 </div>
               ))}
             </div>
@@ -277,17 +487,29 @@ export default function AdminDashboard() {
             <OrdersTable orders={orders.slice(0, 10)} updateStatus={updateStatus} />
           </>
         )}
+
         {tab === 'orders' && (
           <>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 32 }}>الطلبات ({orders.length})</h1>
             <OrdersTable orders={orders} updateStatus={updateStatus} />
           </>
         )}
+
         {tab === 'products' && (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 16 }}>المنتجات</h1>
             <Link href="/admin/products">
-              <button style={{ background: '#1A1A1A', color: 'white', padding: '12px 32px', border: 'none', cursor: 'pointer', fontFamily: 'Cairo, sans-serif', borderRadius: 4 }}>
+              <button
+                style={{
+                  background: '#1A1A1A',
+                  color: 'white',
+                  padding: '12px 32px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'Cairo, sans-serif',
+                  borderRadius: 4,
+                }}
+              >
                 إدارة المنتجات
               </button>
             </Link>
